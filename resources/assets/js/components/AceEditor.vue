@@ -1,6 +1,4 @@
 <script>
-import {mapState} from "vuex";
-
 export default {
     name: 'AceEditor',
     props: {
@@ -294,11 +292,9 @@ export default {
         }
     },
     computed: {
-        ...mapState(['themeIsDark']),
-
         editTheme() {
             if (this.theme == 'auto') {
-                if (this.themeIsDark) {
+                if (window.systemInfo.theme === 'dark') {
                     return "dracula-dark"
                 } else {
                     return "chrome"

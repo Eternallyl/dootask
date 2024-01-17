@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -28,8 +28,42 @@
             version: "{{ $version }}",
             origin: window.location.origin + "/",
             homeUrl: null,
-            apiUrl: null
+            apiUrl: null,
+            //
+            language: window.localStorage.getItem('__system:language__') || '',
+            userId: window.localStorage.getItem('__system:userid__') || '',
+            userToken: window.localStorage.getItem('__system:token__') || '',
         };
+
+        window.systemInfo.themeList = [
+            {name: '跟随系统', value: 'auto'},
+            {name: '明亮', value: 'light'},
+            {name: '暗黑', value: 'dark'},
+        ];
+        window.systemInfo.setTheme = function(theme) {
+            if (theme === null) {
+                theme = window.localStorage.getItem('__system:theme__')
+            } else {
+                window.localStorage.setItem("__system:theme__", theme)
+            }
+            if (!['dark', 'light'].includes(theme)) {
+                let isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+                if (/eeui/i.test(window.navigator.userAgent)) {
+                    isDark = requireModuleJs("eeui").getThemeName() === "dark"
+                }
+                theme = isDark ? 'dark' : 'light'
+            }
+            window.systemInfo.theme = theme;    // 参数只有 light 和 dark
+        };
+        window.systemInfo.setTheme(null);
+
+
+        if (window.systemInfo.theme === 'dark') {
+            let style = document.createElement('style');
+            style.rel = 'stylesheet';
+            style.innerHTML = '.app-view-loading { background-color: #000000; }'
+            document.head.appendChild(style);
+        }
     </script>
 </head>
 <body>

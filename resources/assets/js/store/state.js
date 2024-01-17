@@ -187,15 +187,6 @@ export default {
         {name: '灰色', color: '#f3f3f3', primary: '#999999'},
     ],
 
-    // 主题皮肤
-    themeMode: window.localStorage.getItem("__theme:mode__"),
-    themeList: [
-        {name: '跟随系统', value: 'auto'},
-        {name: '明亮', value: 'light'},
-        {name: '暗黑', value: 'dark'},
-    ],
-    themeIsDark: false,
-
     // 客户端新版本号
     clientNewVersion: null,
 

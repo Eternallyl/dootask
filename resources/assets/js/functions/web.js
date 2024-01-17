@@ -1357,18 +1357,6 @@ import {MarkdownPreview} from "../store/markdown";
                 this.utils.removeClass(document.body, "dark-mode-reverse")
             },
 
-            autoDarkMode() {
-                let darkScheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-                if ($A.isEEUiApp) {
-                    darkScheme = $A.eeuiAppGetThemeName() === "dark"
-                }
-                if (darkScheme) {
-                    this.enableDarkMode()
-                } else {
-                    this.disableDarkMode()
-                }
-            },
-
             isDarkEnabled() {
                 return this.utils.hasClass(document.body, "dark-mode-reverse")
             },

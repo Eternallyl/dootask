@@ -114,7 +114,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['userInfo', 'themeIsDark']),
+        ...mapState(['userInfo']),
 
         fileType() {
             return this.getType(this.value.type);
@@ -239,7 +239,7 @@ export default {
                         "name": this.userInfo.nickname
                     },
                     "customization": {
-                        "uiTheme": this.themeIsDark ? "theme-dark" : "theme-classic-light",
+                        "uiTheme": window.systemInfo.theme === 'dark' ? "theme-dark" : "theme-classic-light",
                         "forcesave": true,
                         "help": false,
                     },

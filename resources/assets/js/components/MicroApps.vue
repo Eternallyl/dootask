@@ -101,7 +101,6 @@ export default {
     computed: {
         ...mapState([
             'userInfo',
-            'themeMode',
         ]),
         getAppData(){
             return {
@@ -116,7 +115,7 @@ export default {
                         DatePicker
                     }
                 },
-                theme: this.themeMode,
+                theme: window.systemInfo.theme,
                 languages: {
                     languageList,
                     languageType,

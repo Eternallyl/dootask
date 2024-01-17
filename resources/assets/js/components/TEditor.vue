@@ -58,7 +58,6 @@
 <script>
     import tinymce from 'tinymce/tinymce';
     import ImgUpload from "./ImgUpload";
-    import {mapState} from "vuex";
     import {languageType} from "../language";
 
     const windowTouch = "ontouchend" in document
@@ -191,8 +190,6 @@
             this.destroy();
         },
         computed: {
-            ...mapState(['themeIsDark']),
-
             headers() {
                 return {
                     fd: $A.getSessionStorageString("userWsFd"),
@@ -312,7 +309,7 @@
                     resize: !isFull,
                     convert_urls:false,
                     toolbar_mode: 'sliding',
-                    content_css: this.themeIsDark ? 'dark' : 'default',
+                    content_css: window.systemInfo.theme === 'dark' ? 'dark' : 'default',
                     setup: (editor) => {
                         editor.ui.registry.addMenuButton('uploadImages', {
                             text: this.$L('图片'),

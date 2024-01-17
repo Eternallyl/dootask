@@ -22,6 +22,8 @@ export default {
         return {
             loadIng: 0,
 
+            themeList: window.systemInfo.themeList,
+
             formData: {
                 theme: '',
             },
@@ -36,8 +38,6 @@ export default {
 
     computed: {
         ...mapState([
-            'themeMode',
-            'themeList',
             'formLabelPosition',
             'formLabelWidth'
         ])
@@ -45,16 +45,15 @@ export default {
 
     methods: {
         initData() {
-            this.$set(this.formData, 'theme', this.themeMode);
+            this.$set(this.formData, 'theme', window.localStorage.getItem('__system:theme__') || 'auto');
             this.formData_bak = $A.cloneJSON(this.formData);
         },
 
         submitForm() {
             this.$refs.formData.validate((valid) => {
                 if (valid) {
-                    this.$store.dispatch("setTheme", this.formData.theme).then(res => {
-                        res && $A.messageSuccess('保存成功');
-                    })
+                    this.$store.dispatch("synchTheme", this.formData.theme);
+                    $A.messageSuccess('保存成功');
                 }
             })
         },

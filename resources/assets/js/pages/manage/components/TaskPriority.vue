@@ -3,8 +3,6 @@
 </template>
 
 <script>
-import {mapState} from "vuex";
-
 export default {
     name: "TaskPriority",
     props: {
@@ -24,11 +22,9 @@ export default {
         }
     },
     computed: {
-        ...mapState(['themeIsDark']),
-
         myStyle() {
-            const {color, background, backgroundColor, themeIsDark} = this;
-            if (themeIsDark) {
+            const {color, background, backgroundColor} = this;
+            if (window.systemInfo.theme === 'dark') {
                 return {
                     color: backgroundColor || background,
                     borderColor: backgroundColor || background,

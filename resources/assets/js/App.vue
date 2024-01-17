@@ -80,7 +80,7 @@ export default {
     },
 
     computed: {
-        ...mapState(['ws', 'themeMode', 'themeIsDark', 'windowOrientation']),
+        ...mapState(['ws', 'windowOrientation']),
 
         isSoftware() {
             return this.$Electron || this.$isEEUiApp;
@@ -187,10 +187,6 @@ export default {
                 this.$store.dispatch("audioStop", true)
             }
         },
-
-        themeIsDark() {
-            this.synchThemeLanguage();
-        }
     },
 
     methods: {
@@ -237,9 +233,10 @@ export default {
         },
 
         autoTheme() {
-            if (this.themeMode === "auto") {
-                this.$store.dispatch("synchTheme")
+            if (['dark', 'light'].includes(window.localStorage.getItem('__system:theme__'))) {
+                return;
             }
+            this.$store.dispatch('synchTheme', 'auto')
         },
 
         synchThemeLanguage() {
@@ -247,7 +244,7 @@ export default {
                 this.iframes = this.iframes.filter(({key}) => key != 'synchThemeLanguage')
                 this.iframes.push({
                     key: 'synchThemeLanguage',
-                    url: $A.apiUrl(`../setting/theme_language?theme=${this.themeIsDark ? 'dark' : 'light'}&language=${languageType}`)
+                    url: $A.apiUrl(`../setting/theme_language?theme=${window.systemInfo.theme}&language=${languageType}`)
                 })
             }
             this.synchAppTheme()
@@ -257,7 +254,7 @@ export default {
             if (this.$isEEUiApp) {
                 $A.eeuiAppSendMessage({
                     action: 'updateTheme',
-                    themeName: this.themeIsDark ? 'dark' : 'light',
+                    themeName: window.systemInfo.theme,
                 });
             }
         },

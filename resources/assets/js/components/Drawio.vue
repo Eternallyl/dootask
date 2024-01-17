@@ -35,7 +35,6 @@
 }
 </style>
 <script>
-import {mapState} from "vuex";
 import IFrame from "../pages/manage/components/IFrame";
 import {languageType} from "../language";
 
@@ -75,7 +74,7 @@ export default {
         }
         let lightbox = this.readOnly ? 1 : 0;
         let chrome = this.readOnly ? 0 : 1;
-        let theme = this.themeIsDark ? 'dark' : 'kennedy';
+        let theme = window.systemInfo.theme === 'dark' ? 'dark' : 'kennedy';
         let title = this.title ? encodeURIComponent(this.title) : '';
         let query = `?title=${title}&chrome=${chrome}&lightbox=${lightbox}&ui=${theme}&lang=${lang}&offline=1&pwa=0&embed=1&noLangIcon=1&noExitBtn=1&noSaveBtn=1&saveAndExit=0&spin=1&proto=json`;
         if (this.$Electron) {
@@ -101,9 +100,6 @@ export default {
             },
             deep: true
         },
-    },
-    computed: {
-        ...mapState(['themeIsDark'])
     },
     methods: {
         formatZoom(val) {

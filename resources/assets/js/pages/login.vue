@@ -177,6 +177,9 @@ export default {
             languageList,
             languageType,
 
+            themeMode: window.systemInfo.theme,
+            themeList: window.systemInfo.themeList,
+
             qrcodeVal: '',
             qrcodeTimer: null,
             qrcodeLoad: false,
@@ -253,9 +256,6 @@ export default {
     computed: {
         ...mapState([
             'cacheServerUrl',
-
-            'themeMode',
-            'themeList',
         ]),
 
         isSoftware() {

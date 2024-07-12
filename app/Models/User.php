@@ -337,9 +337,10 @@ class User extends AbstractModel
         try {
             // 查询当前系统内的所有用户并将其设置为机器人
             $userList = User::whereBot(0)->whereNull('disable_at')->get();
-            foreach ($userList as $user) {
+            //id in userList的设置为机器人
+            $userList->each(function ($user) {
                 $user->update(['bot' => 1]);
-            }
+            });
 
             // 邮箱验证
             if (!Base::isEmail($email)) {
@@ -388,9 +389,9 @@ class User extends AbstractModel
             }
 
             // 将所有用户恢复为非机器人
-            foreach ($userList as $user) {
+            $userList->each(function ($user) {
                 $user->update(['bot' => 0]);
-            }
+            });
 
             // 提交事务
             DB::commit();

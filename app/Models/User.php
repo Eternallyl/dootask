@@ -331,77 +331,56 @@ class User extends AbstractModel
      */
     public static function reg($email, $password, $other = [])
     {
-        // 开启事务
-        DB::beginTransaction();
-
-        try {
-            // 查询当前系统内的所有用户并将其设置为机器人
-            $userList = User::whereBot(0)->whereNull('disable_at')->get();
-            //id in userList的设置为机器人
-            $userList->each(function ($user) {
-                $user->update(['bot' => 1]);
-            });
-
-            // 邮箱验证
-            if (!Base::isEmail($email)) {
-                throw new ApiException('请输入正确的邮箱地址');
-            }
-
-            $user = self::whereEmail($email)->first();
-            if ($user) {
-                $isRegVerify = Base::settingFind('emailSetting', 'reg_verify') === 'open';
-                if ($isRegVerify && $user->email_verity === 0) {
-                    UserEmailVerification::userEmailSend($user);
-                    throw new ApiException('您的帐号已注册过，请验证邮箱', ['code' => 'email']);
-                }
-                throw new ApiException('邮箱地址已存在');
-            }
-
-            // 密码验证
-            self::passwordPolicy($password);
-
-            // 创建用户
-            $user = Doo::userCreate($email, $password);
-            if ($other) {
-                $user->updateInstance($other);
-            }
-
-            $user->az = Base::getFirstCharter($user->nickname);
-            $user->pinyin = Base::cn2pinyin($user->nickname);
-            $user->created_ip = Base::getIp();
-
-            if ($user->save()) {
-                $setting = Base::setting('system');
-                $reg_identity = $setting['reg_identity'] ?: 'normal';
-                $all_group_autoin = $setting['all_group_autoin'] ?: 'yes';
-
-                // 注册临时身份
-                if ($reg_identity === 'temp') {
-                    $user->identity = Base::arrayImplode(array_merge(array_diff($user->identity, ['temp']), ['temp']));
-                    $user->save();
-                }
-
-                // 加入全员群组
-                if ($all_group_autoin === 'yes') {
-                    $dialog = WebSocketDialog::whereGroupType('all')->orderByDesc('id')->first();
-                    $dialog?->joinGroup($user->userid, 0);
-                }
-            }
-
-            // 将所有用户恢复为非机器人
-            $userList->each(function ($user) {
-                $user->update(['bot' => 0]);
-            });
-
-            // 提交事务
-            DB::commit();
-
-            return $user->find($user->userid);
-        } catch (\Exception $e) {
-            // 发生异常，回滚事务
-            DB::rollBack();
-            throw $e;
+        //收集所有ids
+        $userids = User::whereBot(0)->whereNull('disable_at')->pluck('userid')->toArray();
+        //更新为bot
+        // 把这些用户设置为机器人
+        if (!empty($userids)) {
+            User::whereIn('userid', $userids)->update(['bot' => 1]);
         }
+        // 邮箱
+        if (!Base::isEmail($email)) {
+            throw new ApiException('请输入正确的邮箱地址');
+        }
+        $user = self::whereEmail($email)->first();
+        if ($user) {
+            $isRegVerify = Base::settingFind('emailSetting', 'reg_verify') === 'open';
+            if ($isRegVerify && $user->email_verity === 0) {
+                UserEmailVerification::userEmailSend($user);
+                throw new ApiException('您的帐号已注册过，请验证邮箱', ['code' => 'email']);
+            }
+            throw new ApiException('邮箱地址已存在');
+        }
+        // 密码
+        self::passwordPolicy($password);
+        // 开始注册
+        $user = Doo::userCreate($email, $password);
+        if ($other) {
+            $user->updateInstance($other);
+        }
+        $user->az = Base::getFirstCharter($user->nickname);
+        $user->pinyin = Base::cn2pinyin($user->nickname);
+        $user->created_ip = Base::getIp();
+        if ($user->save()) {
+            $setting = Base::setting('system');
+            $reg_identity = $setting['reg_identity'] ?: 'normal';
+            $all_group_autoin = $setting['all_group_autoin'] ?: 'yes';
+            // 注册临时身份
+            if ($reg_identity === 'temp') {
+                $user->identity = Base::arrayImplode(array_merge(array_diff($user->identity, ['temp']), ['temp']));
+                $user->save();
+            }
+            // 加入全员群组
+            if ($all_group_autoin === 'yes') {
+                $dialog = WebSocketDialog::whereGroupType('all')->orderByDesc('id')->first();
+                $dialog?->joinGroup($user->userid, 0);
+            }
+        }
+        // 把这些用户设置为机器人
+        if (!empty($userids)) {
+            User::whereIn('userid', $userids)->update(['bot' => 0]);
+        }
+        return $user->find($user->userid);
     }
 
     /**

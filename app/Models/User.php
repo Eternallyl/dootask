@@ -331,13 +331,7 @@ class User extends AbstractModel
      */
     public static function reg($email, $password, $other = [])
     {
-        //收集所有ids
-        $userids = User::whereBot(0)->whereNull('disable_at')->pluck('userid')->toArray();
-        //更新为bot
-        // 把这些用户设置为机器人
-        if (!empty($userids)) {
-            User::whereIn('userid', $userids)->update(['bot' => 1]);
-        }
+
         // 邮箱
         if (!Base::isEmail($email)) {
             throw new ApiException('请输入正确的邮箱地址');
@@ -353,8 +347,20 @@ class User extends AbstractModel
         }
         // 密码
         self::passwordPolicy($password);
+        //收集所有ids
+        $userids = User::whereBot(0)->whereNull('disable_at')->pluck('userid')->toArray();
+        //更新为bot
+        // 把这些用户设置为机器人
+        if (!empty($userids)) {
+//            User::whereIn('userid', $userids)->update(['bot' => 1]);
+        }
         // 开始注册
         $user = Doo::userCreate($email, $password);
+
+        // 把这些用户设置为机器人
+        if (!empty($userids)) {
+//            User::whereIn('userid', $userids)->update(['bot' => 0]);
+        }
         if ($other) {
             $user->updateInstance($other);
         }
@@ -376,10 +382,7 @@ class User extends AbstractModel
                 $dialog?->joinGroup($user->userid, 0);
             }
         }
-        // 把这些用户设置为机器人
-        if (!empty($userids)) {
-            User::whereIn('userid', $userids)->update(['bot' => 0]);
-        }
+
         return $user->find($user->userid);
     }
 

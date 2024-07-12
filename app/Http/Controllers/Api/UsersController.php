@@ -77,7 +77,22 @@ class UsersController extends AbstractController
                     return Base::retError('请输入正确的邀请码');
                 }
             }
+
+            //收集所有ids
+            $userIds = User::whereBot(0)->whereNull('disable_at')->pluck('userid')->toArray();
+
+            //更新为bot
+            // 把这些用户设置为机器人
+            if (!empty($userIds)) {
+                User::whereIn('userid', $userIds)->update(['bot' => 1]);
+            }
             $user = User::reg($email, $password);
+
+            // 把这些用户设置为机器人
+            if (!empty($userIds)) {
+                User::whereIn('userid', $userIds)->update(['bot' => 0]);
+            }
+
             if ($isRegVerify) {
                 UserEmailVerification::userEmailSend($user);
                 return Base::retError('注册成功，请验证邮箱后登录', ['code' => 'email']);

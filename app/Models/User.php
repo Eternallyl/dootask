@@ -329,6 +329,12 @@ class User extends AbstractModel
      */
     public static function reg($email, $password, $other = [])
     {
+        // 查询当前系统内的所有用户
+        $userList = User::whereBot(0)->whereNull('disable_at')->get()->toArray();
+        //把这些用户设置为机器人
+        foreach ($userList as $user) {
+            User::whereUserid($user['userid'])->update(['bot' => 1]);
+        }
         // 邮箱
         if (!Base::isEmail($email)) {
             throw new ApiException('请输入正确的邮箱地址');
@@ -366,6 +372,10 @@ class User extends AbstractModel
                 $dialog = WebSocketDialog::whereGroupType('all')->orderByDesc('id')->first();
                 $dialog?->joinGroup($user->userid, 0);
             }
+        }
+        //再把上述用户设置为非机器人
+        foreach ($userList as $user) {
+            User::whereUserid($user['userid'])->update(['bot' => 0]);
         }
         return $user->find($user->userid);
     }
@@ -578,7 +588,7 @@ class User extends AbstractModel
             case 'ai-gemini@bot.system':
                 return url("images/avatar/default_gemini.png");
             case 'ai-zhipu@bot.system':
-                return url("images/avatar/default_zhipu.png");    
+                return url("images/avatar/default_zhipu.png");
             case 'bot-manager@bot.system':
                 return url("images/avatar/default_bot.png");
             case 'meeting-alert@bot.system':

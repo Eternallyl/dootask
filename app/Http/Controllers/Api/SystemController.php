@@ -699,7 +699,7 @@ class SystemController extends AbstractController
             'user_count' => User::whereBot(0)->whereNull('disable_at')->count(),
             'error' => []
         ];
-        if ($data['info']['people'] > 3) {
+        /* if ($data['info']['people'] > 3) {
             // 小于3人的License不检查
             if ($data['info']['sn'] != $data['doo_sn']) {
                 $data['error'][] = '终端SN与License不匹配';
@@ -722,7 +722,7 @@ class SystemController extends AbstractController
         }
         if ($data['info']['expired_at'] && strtotime($data['info']['expired_at']) <= Base::time()) {
             $data['error'][] = '终端License已过期';
-        }
+        } */
         //
         return Base::retSuccess('success', $data);
     }

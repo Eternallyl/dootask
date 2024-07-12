@@ -22,7 +22,7 @@ Group No.: `546574618`
 # 1、Clone the repository
 
 # Clone projects on github
-git clone -b pro --depth=1 https://github.com/kuaifan/dootask.git
+git clone -b pro --depth=1 https://github.com/Eternallyl/dootask.git
 # Or you can use gitee
 git clone -b pro --depth=1 https://gitee.com/aipaw/dootask.git
 
